@@ -10,6 +10,18 @@
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500;1,700&family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- FONT FOR A -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ephesis&display=swap"
+      rel="stylesheet"
+    />
 
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
@@ -27,21 +39,30 @@
         color: var(--text-dark);
         overflow: hidden; /* Блокируем скролл до загрузки */
         -webkit-font-smoothing: antialiased;
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
       }
 
       .font-serif-fancy {
         font-family: "Great Vibes", cursive;
       }
       /* Новый стиль для имен с правильной заглавной А */
+      .font-names-a {
+        font-family: "Ephesis", cursive;
+        font-weight: 400;
+        font-style: normal;
+      }
       .font-names {
-        font-family: "Cormorant Garamond", serif;
-        font-style: italic;
-        font-weight: 500;
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-style: normal;
       }
 
       /* Вариант 4: Pinyon Script — каллиграфия, где заглавные буквы очень крупные и разборчивые */
       .font-pinyon {
         font-family: "Pinyon Script", cursive;
+        font-weight: 500;
+        font-style: normal;
       }
       .font-engraved {
         font-family: "Cormorant Garamond", serif;
@@ -238,10 +259,12 @@
         />
         <div class="absolute inset-0 bg-black/25 z-10"></div>
         <div class="relative z-20" data-aos="fade-up" data-aos-duration="2000">
-          <h1 class="text-7xl md:text-9xl font-names mb-6 drop-shadow-2xl">
-            Диас & Альфия
+          <h1
+            class="text-7xl md:text-9xl font-names mb-6 drop-shadow-2xl leading-2"
+          >
+            Диас &<br /><span class="font-names-a">A</span>льфия
           </h1>
-          <p class="text-sm md:text-base tracking-[0.4em] uppercase font-light">
+          <p class="text-md md:text-base tracking-[0.4em] uppercase font-light">
             Свадебное торжество
           </p>
         </div>
@@ -436,13 +459,80 @@
         '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
 
       let isStarted = false;
+      let sectionTimeout;
+      let currentSectionIndex = 0;
+      const sections = document.querySelectorAll("section, footer");
 
-      // Убираем прелоадер только когда все загружено
+      // --- ФУНКЦИЯ ПЛАВНОГО КАСТОМНОГО СКРОЛЛА ---
+      function smoothScrollTo(targetPosition, duration) {
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        let startTime = null;
+
+        function animation(currentTime) {
+          if (startTime === null) startTime = currentTime;
+          const timeElapsed = currentTime - startTime;
+
+          // Функция плавности (Ease-in-out)
+          const run = ease(timeElapsed, startPosition, distance, duration);
+
+          window.scrollTo(0, run);
+
+          if (timeElapsed < duration) {
+            requestAnimationFrame(animation);
+          }
+        }
+
+        // Математическая функция для мягкого старта и стопа
+        function ease(t, b, c, d) {
+          t /= d / 2;
+          if (t < 1) return (c / 2) * t * t + b;
+          t--;
+          return (-c / 2) * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animation);
+      }
+
+      // --- ОБНОВЛЕННАЯ ЛОГИКА ПЕРЕХОДА ---
+      function scrollToNextSection() {
+        if (introOverlay.parentNode) return;
+
+        let closestIndex = 0;
+        let minDistance = Math.abs(window.pageYOffset - sections[0].offsetTop);
+
+        sections.forEach((section, index) => {
+          const distance = Math.abs(window.pageYOffset - section.offsetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+          }
+        });
+
+        const nextIndex = closestIndex + 1;
+
+        if (nextIndex < sections.length) {
+          const targetTop = sections[nextIndex].offsetTop;
+
+          // ВТОРОЙ ПАРАМЕТР (3000) — это длительность скролла в миллисекундах.
+          // Поставь 5000, если хочешь, чтобы он ехал ОЧЕНЬ медленно.
+          smoothScrollTo(targetTop, 3000);
+        }
+      }
+
+      function resetSectionTimer() {
+        clearTimeout(sectionTimeout);
+        // Запускаем переход через 3 секунды неактивности
+        if (isStarted && !introOverlay.parentNode) {
+          sectionTimeout = setTimeout(scrollToNextSection, 4000);
+        }
+      }
+
+      // --- ЛОГИКА ИНТРО ---
       window.onload = () => {
         preloader.style.opacity = "0";
         setTimeout(() => {
           preloader.remove();
-          document.body.style.overflow = "hidden"; // Держим закрытым до активации видео
         }, 500);
       };
 
@@ -460,12 +550,18 @@
       }
 
       function fade() {
+        if (mainContent.classList.contains("opacity-100")) return;
         introOverlay.classList.add("fade-out");
         mainContent.classList.replace("opacity-0", "opacity-100");
         musicContainer.classList.remove("hidden");
-        setTimeout(() => musicContainer.classList.add("opacity-100"), 100);
-        document.body.style.overflow = "auto";
-        setTimeout(() => introOverlay.remove(), 1100);
+        setTimeout(() => {
+          musicContainer.classList.add("opacity-100");
+          document.body.style.overflow = "auto";
+          if (introOverlay.parentNode) introOverlay.remove();
+
+          // Активируем первый таймер
+          resetSectionTimer();
+        }, 1000);
       }
 
       function updateMusic() {
@@ -475,6 +571,7 @@
           : "running";
       }
 
+      // --- СОБЫТИЯ ---
       introOverlay.addEventListener("click", activate);
       musicBtn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -482,9 +579,16 @@
         updateMusic();
       });
 
+      // Любое действие пользователя сбрасывает 3-секундный таймер
+      ["mousedown", "wheel", "touchstart", "scroll", "keydown"].forEach(
+        (event) => {
+          window.addEventListener(event, resetSectionTimer, { passive: true });
+        },
+      );
+
       setTimeout(() => {
         if (!isStarted) activate();
-      }, 6000);
+      }, 3000);
     </script>
   </body>
 </html>
