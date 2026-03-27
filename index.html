@@ -185,14 +185,14 @@
 
       /* Лента теперь привязана к высоте экрана через vh */
 .dynamic-ribbon {
+  /* bottom будет не меньше 50px и не больше 300px, 
+     а в идеале — 20% от высоты экрана */
   bottom: 20vh; 
   width: 100%;
 }
 
 /* Динамический размер текста: 8% от ширины экрана, но не меньше 24px и не больше 80px */
-.responsive-text {
-  font-size: 40px;
-}
+
 
 /* Динамические отступы кнопки */
 .responsive-py {
@@ -210,6 +210,46 @@
           transform: scaleX(1); 
         }
       }
+
+
+
+@media (max-height: 400px) {
+  .dynamic-ribbon {
+    bottom: 5dvh; 
+  }
+}
+
+@media (min-height: 400px) and (max-height: 500px) {
+  .dynamic-ribbon {
+    bottom: 10dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+@media (min-height: 500px) and (max-height: 800px) {
+  .dynamic-ribbon {
+    bottom: 20dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+@media (min-height:800px) and (max-height: 1200px) {
+  .dynamic-ribbon {
+    bottom: 22dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+@media (min-height: 900px) and (max-height: 1200px) {
+  .dynamic-ribbon {
+    bottom: 15dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+
+@media (min-height: 1300px) {
+  .dynamic-ribbon {
+    bottom: 350px; /* Перебиваем максимум из clamp для гигантских экранов */
+  }
+}
+  
     </style>
   </head>
   <body>
@@ -234,7 +274,9 @@
       </video>
       
       <div class="absolute inset-0 bg-black/10 z-10"></div>
-<div class="absolute dynamic-ribbon bg-[#819870] py-[4vw] left-0 w-full z-10 shadow-md">
+
+
+<div class="absolute dynamic-ribbon bg-[#819870] py-[3vh] left-0 w-full z-10 shadow-md">
     <div class="left-0 w-full z-20">
         <button 
             onclick="activate()"
@@ -242,7 +284,7 @@
                   bg-gradient-to-b from-[#3a4130] via-[#4a503d] to-[#3a4130] 
                   border-y-[0.15vw] border-[#b38b59]
                   shadow-[0_0.5vw_4vw_rgba(0,0,0,0.6)] 
-                  text-[#e5d5b5] text-[7vh] font-serif leading-none
+                  text-[#e5d5b5] text-[50px] font-serif leading-none
                   transition-all duration-500 active:scale-[0.98]"
         >
             <div class="absolute top-[0.4vw] left-0 w-full h-[1px] bg-[#b38b59]/50"></div>
