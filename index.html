@@ -377,7 +377,8 @@
           <p
             class="text-stone-600 text-sm tracking-[0.3em] uppercase mb-14 font-medium"
           >
-            г. Алматы, ул. Сеитова, 12
+            г. Алматы, 
+            <br/>ул. Сеитова, 12
           </p>
           <a
             href="https://2gis.kz/almaty/firm/70000001023455019"
@@ -536,8 +537,8 @@
       function activate() {
         if (isStarted) return;
         isStarted = true;
-        introVideo.muted = false;
         introVideo.play().catch(() => {});
+        bgSong.volume = 0.2;
         bgSong
           .play()
           .then(updateMusic)
