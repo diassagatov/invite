@@ -31,6 +31,7 @@
         --accent-gold: #b38b59;
         --text-dark: #333333;
         --text-stone: #57534e;
+        
       }
 
       body {
@@ -99,6 +100,10 @@
         filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
         z-index: 20;
       }
+
+
+
+      
       .invitation-ribbon {
         background: linear-gradient(
           90deg,
@@ -177,6 +182,17 @@
         border: 2px solid var(--accent-gold);
         transition: all 0.4s ease;
       }
+
+      @keyframes slideInRibbon {
+        from { 
+          opacity: 0; 
+          transform: scaleX(0.8); 
+        }
+        to { 
+          opacity: 1; 
+          transform: scaleX(1); 
+        }
+      }
     </style>
   </head>
   <body>
@@ -184,7 +200,7 @@
       <div class="loader-spin"></div>
     </div>
 
-    <div
+ <div
       id="intro-overlay"
       class="fixed inset-0 z-[100] flex items-center justify-center bg-[#faf9f6] cursor-pointer"
     >
@@ -199,54 +215,104 @@
           type="video/mp4"
         />
       </video>
+      
+      <div class="absolute inset-0 bg-black/10 z-10"></div>
+
+<div class="absolute bottom-[18%] bg-[#819870] py-6 left-0 w-full z-10 shadow-md">
+<div class="left-0 w-full z-20">
+    <button 
+        onclick="activate()"
+        class="group relative w-full py-7 
+               /* Глубокий оливковый с вертикальным объемом */
+               bg-gradient-to-b from-[#3a4130] via-[#4a503d] to-[#3a4130] 
+               /* Явные золотые границы (сверху и снизу) */
+               border-y-[1.5px] border-[#b38b59]
+               /* Тень для веса */
+               shadow-[0_5px_60px_rgba(0,0,0,0.6)] 
+               /* Текст: благородное золото */
+               text-[#e5d5b5] text-[52px] font-names leading-none
+               transition-all duration-500 active:scale-[0.98]"
+    >
+        <div class="absolute top-[4px] left-0 w-full h-[1px] bg-[#b38b59]/50 shadow-[0_1px_1px_rgba(0,0,0,0.3)]"></div>
+        
+        <span class="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Открыть</span>
+        
+        <div class="absolute bottom-[4px] left-0 w-full h-[1px] bg-[#b38b59]/50 shadow-[0_-1px_2px_rgba(0,0,0,0.3)]"></div>
+        
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none"></div>
+    </button>
+</div>
+
+
+
+</div>
+
+     
     </div>
 
+    <style>
+      @keyframes fadeInScale {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
     <div
-      id="music-container"
-      class="fixed bottom-6 right-6 z-50 opacity-0 transition-opacity duration-1000 hidden"
+  id="music-container"
+  class="fixed bottom-6 right-6 z-[100] opacity-0 transition-opacity duration-1000 hidden pointer-events-none"
+>
+  <div class="relative w-24 h-24 flex items-center justify-center pointer-events-auto">
+    <svg class="rotating-text absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+      <defs>
+        <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"></path>
+      </defs>
+      <text fill="#b38b59" font-size="8" font-weight="600" letter-spacing="1.5">
+        <textPath xlink:href="#circlePath">• THE NIGHT WE MET • THE NIGHT WE MET</textPath>
+      </text>
+    </svg>
+
+    <button
+      id="music-btn"
+      type="button"
+      class="bg-white/95 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[110] border border-stone-100 active:scale-90 transition-transform cursor-pointer"
     >
-      <div class="relative w-24 h-24 flex items-center justify-center">
-        <svg
-          class="rotating-text absolute inset-0 w-full h-full"
-          viewBox="0 0 100 100"
-        >
-          <defs>
-            <path
-              id="circlePath"
-              d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
-            ></path>
-          </defs>
-          <text
-            fill="#b38b59"
-            font-size="8"
-            font-weight="600"
-            letter-spacing="1.5"
-          >
-            <textPath xlink:href="#circlePath">
-              • THE NIGHT WE MET • THE NIGHT WE MET
-            </textPath>
-          </text>
-        </svg>
-        <button
-          id="music-btn"
-          class="bg-white/90 text-amber-900 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center z-10 border border-stone-100"
-        >
-          <div
-            id="music-icon-svg"
-            class="w-5 h-5 flex items-center justify-center fill-[#b38b59]"
-          >
-            <svg viewBox="0 0 24 24" class="play-svg">
-              <path
-                d="M8 5.14v14.72a1 1 0 0 0 1.5.86l11-7.36a1 1 0 0 0 0-1.72l-11-7.36a1 1 0 0 0-1.5.86z"
-              />
-            </svg>
-          </div>
-        </button>
-      </div>
-      <audio id="bg-song" loop>
-        <source src="song.mp3" type="audio/mpeg" />
-      </audio>
-    </div>
+      <img 
+        id="music-icon-img" 
+        src="play.svg" 
+        alt="music control" 
+        class="w-6 h-6 object-contain pointer-events-none"
+      />
+    </button>
+  </div>
+
+  <audio id="bg-song" loop>
+    <source src="song.mp3" type="audio/mpeg" />
+  </audio>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <main id="main-content" class="opacity-0 transition-opacity duration-1000">
       <section
@@ -534,18 +600,59 @@
         }, 500);
       };
 
-      function activate() {
+     function activate() {
         if (isStarted) return;
         isStarted = true;
-        introVideo.play().catch(() => {});
+
+        // Звуковые настройки
         bgSong.volume = 0.2;
-        bgSong
-          .play()
+        
+        // Попытка запустить видео со звуком
+        introVideo.muted = false; 
+        let playPromise = introVideo.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            introVideo.muted = true;
+            introVideo.play();
+          });
+        }
+
+        // Запуск музыки
+        bgSong.play()
           .then(updateMusic)
-          .catch(() => {});
+          .catch(e => console.log("Safari requirements check..."));
+
+        // Плавное исчезновение ленты при клике
+        const ribbon = introOverlay.querySelector('div.absolute.bottom-\\[25\\%\\]');
+        if (ribbon) {
+            ribbon.style.transition = "all 0.8s ease";
+            ribbon.style.opacity = "0";
+            ribbon.style.transform = "translateY(20px)";
+        }
+
+        // Уходим в основной контент
         setTimeout(fade, 4800);
         introVideo.onended = fade;
       }
+
+      // --- СОБЫТИЯ ---
+      // Клик по всему оверлею запускает процесс
+      introOverlay.addEventListener("click", activate);
+
+      // Удаляем старый автозапуск из конца кода! 
+      // Вместо него можно оставить только этот блок, если хочешь запуск БЕЗ кнопки через 10 сек (на случай если гость тупит)
+      window.autoStartTimer = setTimeout(() => {
+         // Но помни: в Safari без клика музыка НЕ заиграет.
+         // Лучше оставить только клик.
+      }, 10000);
+
+      // Кнопка управления музыкой на самом сайте (уже после интро)
+      musicBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Чтобы клик по кнопке не вызывал события на родителях
+        bgSong.paused ? bgSong.play() : bgSong.pause();
+        updateMusic();
+      });
 
       function fade() {
         if (mainContent.classList.contains("opacity-100")) return;
@@ -562,12 +669,33 @@
         }, 1000);
       }
 
-      function updateMusic() {
-        musicIconSvg.innerHTML = bgSong.paused ? playIcon : pauseIcon;
-        rotatingSvg.style.animationPlayState = bgSong.paused
-          ? "paused"
-          : "running";
-      }
+      const musicIconImg = document.getElementById("music-icon-img");
+
+function updateMusic() {
+  // Меняем путь к файлу в зависимости от состояния
+  musicIconImg.src = bgSong.paused ? "play.svg" : "pause.svg";
+  
+  // Управление вращением текста
+  rotatingSvg.style.animationPlayState = bgSong.paused ? "paused" : "running";
+
+  // Небольшой фикс центровки для иконки Play (она часто кажется смещенной влево)
+  if (bgSong.paused) {
+    musicIconImg.classList.add('pl-0.5');
+  } else {
+    musicIconImg.classList.remove('pl-0.5');
+  }
+}
+
+// Обработка клика и тача (чтобы точно нажималось на мобилках)
+const toggleMusic = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  bgSong.paused ? bgSong.play().then(updateMusic) : bgSong.pause();
+  updateMusic();
+};
+
+musicBtn.addEventListener("click", toggleMusic);
+musicBtn.addEventListener("touchstart", toggleMusic, { passive: false });
 
       // --- СОБЫТИЯ ---
       introOverlay.addEventListener("click", activate);
@@ -584,9 +712,7 @@
         },
       );
 
-      setTimeout(() => {
-        if (!isStarted) activate();
-      }, 4300);
+      
     </script>
   </body>
 </html>
