@@ -183,6 +183,23 @@
         transition: all 0.4s ease;
       }
 
+      /* Лента теперь привязана к высоте экрана через vh */
+.dynamic-ribbon {
+  bottom: 24vh; 
+  width: 100%;
+}
+
+/* Динамический размер текста: 8% от ширины экрана, но не меньше 24px и не больше 80px */
+.responsive-text {
+  font-size: 40px;
+}
+
+/* Динамические отступы кнопки */
+.responsive-py {
+  padding-top: 3vh;
+  padding-bottom: 3vh;
+}
+
       @keyframes slideInRibbon {
         from { 
           opacity: 0; 
@@ -217,35 +234,27 @@
       </video>
       
       <div class="absolute inset-0 bg-black/10 z-10"></div>
-
-<div class="absolute bottom-[18%] bg-[#819870] py-6 left-0 w-full z-10 shadow-md">
-<div class="left-0 w-full z-20">
-    <button 
-        onclick="activate()"
-        class="group relative w-full py-7 
-               /* Глубокий оливковый с вертикальным объемом */
-               bg-gradient-to-b from-[#3a4130] via-[#4a503d] to-[#3a4130] 
-               /* Явные золотые границы (сверху и снизу) */
-               border-y-[1.5px] border-[#b38b59]
-               /* Тень для веса */
-               shadow-[0_5px_60px_rgba(0,0,0,0.6)] 
-               /* Текст: благородное золото */
-               text-[#e5d5b5] text-[52px] font-names leading-none
-               transition-all duration-500 active:scale-[0.98]"
-    >
-        <div class="absolute top-[4px] left-0 w-full h-[1px] bg-[#b38b59]/50 shadow-[0_1px_1px_rgba(0,0,0,0.3)]"></div>
-        
-        <span class="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">Открыть</span>
-        
-        <div class="absolute bottom-[4px] left-0 w-full h-[1px] bg-[#b38b59]/50 shadow-[0_-1px_2px_rgba(0,0,0,0.3)]"></div>
-        
-        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none"></div>
-    </button>
-</div>
-
-
-
-</div>
+<div class="absolute dynamic-ribbon bg-[#819870] py-[2vw] left-0 w-full z-10 shadow-md">
+    <div class="left-0 w-full z-20">
+        <button 
+            onclick="activate()"
+            class="group relative w-full py-[2.5vw] 
+                  bg-gradient-to-b from-[#3a4130] via-[#4a503d] to-[#3a4130] 
+                  border-y-[0.15vw] border-[#b38b59]
+                  shadow-[0_0.5vw_4vw_rgba(0,0,0,0.6)] 
+                  text-[#e5d5b5] text-[7vh] font-serif leading-none
+                  transition-all duration-500 active:scale-[0.98]"
+        >
+            <div class="absolute top-[0.4vw] left-0 w-full h-[1px] bg-[#b38b59]/50"></div>
+            
+            <span class="relative font-names z-10 drop-shadow-[0_0.2vw_0.3vw_rgba(0,0,0,0.4)]">Открыть</span>
+            
+            <div class="absolute bottom-[0.4vw] left-0 w-full h-[1px] bg-[#b38b59]/50"></div>
+            
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent pointer-events-none"></div>
+        </button>
+    </div>
+  </div>
 
      
     </div>
