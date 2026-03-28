@@ -267,16 +267,14 @@
     >
       <video
         id="intro-video"
-        class="absolute inset-0 w-full h-full object-cover"
+        class="pointer-events-none absolute inset-0 h-full w-full object-cover"
         playsinline
         webkit-playsinline
         muted
-        preload="auto"
+        preload="metadata"
+        src="./intro-videokaz.mp4"
       >
-        <source
-          src="./intro-videokaz.mp4"
-          type="video/mp4"
-        />
+        <source src="./intro-videokaz.mp4" type="video/mp4" />
       </video>
       
       <div class="absolute inset-0 bg-black/10 z-10"></div>
@@ -556,7 +554,15 @@
 
       introVideo.playsInline = true;
       introVideo.setAttribute("webkit-playsinline", "");
-      introVideo.load();
+      introVideo.setAttribute("playsinline", "");
+
+      introOverlay.addEventListener(
+        "pointerdown",
+        () => {
+          introVideo.load();
+        },
+        { once: true, passive: true },
+      );
 
       let isStarted = false;
       let sectionTimeout;
@@ -643,7 +649,7 @@
         // Звуковые настройки
         bgSong.volume = 0.2;
 
-        function playIntroWithSound() {
+        function playWithFallbackMuted() {
           introVideo.muted = false;
           const playPromise = introVideo.play();
           if (playPromise !== undefined) {
@@ -654,18 +660,33 @@
           }
         }
 
-        if (introVideo.readyState >= 2) {
-          playIntroWithSound();
-        } else {
-          introVideo.addEventListener("canplay", playIntroWithSound, { once: true });
-          introVideo.addEventListener(
-            "error",
-            () => {
-              fade();
-            },
-            { once: true },
-          );
+        let introUnmuteScheduled = false;
+        function afterMutedStarted() {
+          if (introUnmuteScheduled) return;
+          introUnmuteScheduled = true;
+          requestAnimationFrame(() => {
+            playWithFallbackMuted();
+          });
         }
+
+        introVideo.muted = true;
+        const first = introVideo.play();
+        if (first !== undefined) {
+          first.then(afterMutedStarted).catch(() => {
+            introVideo.addEventListener("canplay", afterMutedStarted, { once: true });
+            introVideo.addEventListener("loadeddata", afterMutedStarted, { once: true });
+          });
+        } else {
+          afterMutedStarted();
+        }
+
+        introVideo.addEventListener(
+          "error",
+          () => {
+            fade();
+          },
+          { once: true },
+        );
 
         // Запуск музыки
         bgSong.play()
