@@ -1,0 +1,2 @@
+# Netlify: URL stays the same, content from the file (200 = rewrite)
+/oral   /indexkaz.html   200

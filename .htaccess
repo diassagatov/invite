@@ -1,0 +1,9 @@
+# Apache (shared hosting): / → index.html по умолчанию; /oral → indexkaz.html
+<IfModule mod_dir.c>
+  DirectoryIndex index.html
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^oral/?$ indexkaz.html [L,NC]
+</IfModule>

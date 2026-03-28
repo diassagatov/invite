@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/oral", "destination": "/indexkaz.html" }
+  ]
+}
