@@ -265,7 +265,9 @@
         id="intro-video"
         class="absolute inset-0 w-full h-full object-cover"
         playsinline
+        webkit-playsinline
         muted
+        preload="auto"
       >
         <source
           src="./intro-videorus.mp4"
@@ -644,6 +646,10 @@
       const pauseIcon =
         '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
 
+      introVideo.playsInline = true;
+      introVideo.setAttribute("webkit-playsinline", "");
+      introVideo.load();
+
       let isStarted = false;
       let sectionTimeout;
       let currentSectionIndex = 0;
@@ -680,35 +686,9 @@
         requestAnimationFrame(animation);
       }
 
-      // // --- ОБНОВЛЕННАЯ ЛОГИКА ПЕРЕХОДА ---
-      // function scrollToNextSection() {
-      //   if (introOverlay.parentNode) return;
-
-      //   let closestIndex = 0;
-      //   let minDistance = Math.abs(window.pageYOffset - sections[0].offsetTop);
-
-      //   sections.forEach((section, index) => {
-      //     const distance = Math.abs(window.pageYOffset - section.offsetTop);
-      //     if (distance < minDistance) {
-      //       minDistance = distance;
-      //       closestIndex = index;
-      //     }
-      //   });
-
-      //   const nextIndex = closestIndex + 1;
-
-      //   if (nextIndex < sections.length) {
-      //     const targetTop = sections[nextIndex].offsetTop;
-
-      //     // ВТОРОЙ ПАРАМЕТР (3000) — это длительность скролла в миллисекундах.
-      //     // Поставь 5000, если хочешь, чтобы он ехал ОЧЕНЬ медленно.
-      //     smoothScrollTo(targetTop, 3000);
-      //   }
-      // }
-
       function resetSectionTimer() {
         clearTimeout(sectionTimeout);
-        // Запускаем переход через 3 секунды неактивности
+        
         if (isStarted && !introOverlay.parentNode) {
           sectionTimeout = setTimeout(scrollToNextSection, 4000);
         }
@@ -728,16 +708,29 @@
 
         // Звуковые настройки
         bgSong.volume = 0.2;
-        
-        // Попытка запустить видео со звуком
-        introVideo.muted = false; 
-        let playPromise = introVideo.play();
-        
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
-            introVideo.muted = true;
-            introVideo.play();
-          });
+
+        function playIntroWithSound() {
+          introVideo.muted = false;
+          const playPromise = introVideo.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              introVideo.muted = true;
+              introVideo.play();
+            });
+          }
+        }
+
+        if (introVideo.readyState >= 2) {
+          playIntroWithSound();
+        } else {
+          introVideo.addEventListener("canplay", playIntroWithSound, { once: true });
+          introVideo.addEventListener(
+            "error",
+            () => {
+              fade();
+            },
+            { once: true },
+          );
         }
 
         // Запуск музыки
@@ -759,8 +752,8 @@
       }
 
       // --- СОБЫТИЯ ---
-      // Клик по всему оверлею запускает процесс
       introOverlay.addEventListener("click", activate);
+      introOverlay.addEventListener("touchend", activate, { passive: true });
 
       // Удаляем старый автозапуск из конца кода! 
       // Вместо него можно оставить только этот блок, если хочешь запуск БЕЗ кнопки через 10 сек (на случай если гость тупит)
@@ -818,14 +811,6 @@ const toggleMusic = (e) => {
 
 musicBtn.addEventListener("click", toggleMusic);
 musicBtn.addEventListener("touchstart", toggleMusic, { passive: false });
-
-      // --- СОБЫТИЯ ---
-      introOverlay.addEventListener("click", activate);
-      musicBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        bgSong.paused ? bgSong.play() : bgSong.pause();
-        updateMusic();
-      });
 
       // Любое действие пользователя сбрасывает 3-секундный таймер
       ["mousedown", "wheel", "touchstart", "scroll", "keydown"].forEach(
