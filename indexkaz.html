@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Приглашение на свадьбу | Диас & Альфия</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500;1,700&family=Great+Vibes&family=Montserrat:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- FONT FOR A -->
+     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ephesis&display=swap"
+      rel="stylesheet"
+    />
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <style>
+      :root {
+        --soft-bg: #faf9f6;
+        --accent-gold: #b38b59;
+        --text-dark: #333333;
+        --text-stone: #57534e;
+        
+      }
+
+      body {
+        font-family: "Montserrat", sans-serif;
+        background-color: var(--soft-bg);
+        color: var(--text-dark);
+        overflow: hidden; /* Блокируем скролл до загрузки */
+        -webkit-font-smoothing: antialiased;
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .font-serif-fancy {
+          font-family: "Caveat", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+      }
+      /* Новый стиль для имен с правильной заглавной А */
+      .font-names-a {
+        font-family: "Ephesis", cursive;
+        font-weight: 400;
+        font-style: normal;
+      }
+      .font-names {
+        font-family: "Great Vibes", cursive;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      /* Вариант 4: Pinyon Script — каллиграфия, где заглавные буквы очень крупные и разборчивые */
+      .font-pinyon {
+        font-family: "Pinyon Script", cursive;
+        font-weight: 500;
+        font-style: normal;
+      }
+      .font-engraved {
+        font-family: "Cormorant Garamond", serif;
+      }
+
+      /* PRELOADER */
+      #preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: #faf9f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.5s ease;
+      }
+      .loader-spin {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #e3d5ca;
+        border-top-color: var(--accent-gold);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ЛЕНТА */
+      .ribbon-container {
+        position: relative;
+        filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
+        z-index: 20;
+      }
+
+
+
+      
+      .invitation-ribbon {
+        background: linear-gradient(
+          90deg,
+          #e3d5ca 0%,
+          #fdfaf5 50%,
+          #e3d5ca 100%
+        );
+        width: 100%;
+        padding: 50px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.7);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .engraved-text {
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: #4a403d;
+        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+      }
+
+      /* КАЛЕНДАРЬ */
+      .calendar-grid div {
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+
+      @keyframes heartPulse {
+        0% {
+          transform: scale(1) translateY(-14px);
+        }
+        50% {
+          transform: scale(1.15) translateY(-18px);
+          filter: drop-shadow(0 0 8px rgba(179, 139, 89, 0.5));
+        }
+        100% {
+          transform: scale(1) translateY(-14px);
+        }
+      }
+      .heart-marker {
+        position: relative;
+        z-index: 10;
+        animation: heartPulse 2s infinite ease-in-out;
+      }
+      .heart-svg {
+        top: 14px;
+        position: absolute;
+        width: 55px;
+        height: 55px;
+        fill: var(--accent-gold);
+        z-index: -1;
+      }
+
+      /* МУЗЫКА */
+      @keyframes rotateText {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .rotating-text {
+        animation: rotateText 12s linear infinite;
+        transform-origin: center;
+      }
+
+      .fade-out {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        pointer-events: none;
+      }
+
+      .map-button {
+        border: 2px solid var(--accent-gold);
+        transition: all 0.4s ease;
+      }
+
+      /* Лента теперь привязана к высоте экрана через vh */
+.dynamic-ribbon {
+  /* bottom будет не меньше 50px и не больше 300px, 
+     а в идеале — 20% от высоты экрана */
+  bottom: 20vh; 
+  width: 100%;
+}
+
+/* Динамический размер текста: 8% от ширины экрана, но не меньше 24px и не больше 80px */
+
+
+/* Динамические отступы кнопки */
+.responsive-py {
+  padding-top: 10vh;
+  padding-bottom: 10vh;
+}
+
+      @keyframes slideInRibbon {
+        from { 
+          opacity: 0; 
+          transform: scaleX(0.8); 
+        }
+        to { 
+          opacity: 1; 
+          transform: scaleX(1); 
+        }
+      }
+
+
+
+@media (max-height: 400px) {
+  .dynamic-ribbon {
+    bottom: 5dvh; 
+  }
+}
+
+@media (min-height: 400px) and (max-height: 550px) {
+  .dynamic-ribbon {
+    bottom: 10dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+@media (min-height: 550px) and (max-height: 700px) {
+  .dynamic-ribbon {
+    bottom: 16dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+@media (min-height: 700px) and (max-height: 800px) {
+  .dynamic-ribbon {
+    bottom: 20dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+@media (min-height:800px) and (max-height: 1200px) {
+  .dynamic-ribbon {
+    bottom: 22dvh; /* Делаем чуть ниже для визуального баланса */
+  }
+}
+
+
+@media (min-height: 1300px) {
+  .dynamic-ribbon {
+    bottom: 350px; /* Перебиваем максимум из clamp для гигантских экранов */
+  }
+}
+  
+    </style>
+  </head>
+  <body>
+    <div id="preloader">
+      <div class="loader-spin"></div>
+    </div>
+
+ <div
+      id="intro-overlay"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-[#faf9f6] cursor-pointer"
+    >
+      <video
+        id="intro-video"
+        class="absolute inset-0 w-full h-full object-cover"
+        playsinline
+        muted
+      >
+        <source
+          src="./intro-videokaz.mp4"
+          type="video/mp4"
+        />
+      </video>
+      
+      <div class="absolute inset-0 bg-black/10 z-10"></div>
+
+
+
+     
+    </div>
+
+    <style>
+      @keyframes fadeInScale {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div
+  id="music-container"
+  class="fixed bottom-6 right-6 z-[100] opacity-0 transition-opacity duration-1000 hidden pointer-events-none"
+>
+  <div class="relative w-24 h-24 flex items-center justify-center pointer-events-auto">
+    <svg class="rotating-text absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+      <defs>
+        <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"></path>
+      </defs>
+      <text fill="#b38b59" font-size="8" font-weight="600" letter-spacing="1.5">
+        <textPath xlink:href="#circlePath">• THE NIGHT WE MET • THE NIGHT WE MET</textPath>
+      </text>
+    </svg>
+
+    <button
+      id="music-btn"
+      type="button"
+      class="bg-white/95 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center z-[110] border border-stone-100 active:scale-90 transition-transform cursor-pointer"
+    >
+      <img 
+        id="music-icon-img" 
+        src="play.svg" 
+        alt="music control" 
+        class="w-6 h-6 object-contain pointer-events-none"
+      />
+    </button>
+  </div>
+
+  <audio id="bg-song" loop>
+    <source src="song.mp3" type="audio/mpeg" />
+  </audio>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <main id="main-content" class="opacity-0 transition-opacity duration-1000">
+      <section
+        class="relative h-screen flex items-center justify-center text-center text-white px-4"
+      >
+        <img
+          src="photo.webp"
+          class="absolute inset-0 w-full h-full object-cover"
+          alt="Wedding"
+        />
+        <div class="absolute inset-0 bg-black/25 z-10"></div>
+        <div class="relative z-20" data-aos="fade-up" data-aos-duration="2000">
+          <h1
+            class="text-7xl md:text-9xl font-names mb-6 drop-shadow-2xl leading-2"
+          >
+            Диас &<br /><span class="font-names-a">A</span>льфия
+          </h1>
+          <p class="text-md md:text-base tracking-[0.4em] uppercase font-light">
+            Үйлену тойы          </p>
+        </div>
+      </section>
+
+      <section class="py-28 px-10 max-w-3xl mx-auto text-center">
+        <div data-aos="fade-up">
+          <h2 class="text-6xl font-serif-fancy text-[#8c7851] mb-10">
+            Құрметті қонақтар!
+          </h2>
+          <p
+            class="text-stone-700 text-xl md:text-2xl leading-relaxed font-light italic"
+          >
+            Салтанатты қуанышымызды бізбен бірге бөлісуге шақырамыз. Сіздердің келулеріңіз біз үшін ең қымбат сыйлық болмақ!
+          </p>
+        </div>
+      </section>
+
+      <section class="py-24 bg-white shadow-sm border-y border-stone-100">
+        <div class="max-w-md mx-auto px-6 text-center" data-aos="fade-up">
+          <div class="mb-14">
+            <h3
+              class="text-6xl md:text-7xl font-serif-fancy text-[#8c7851] lowercase"
+            >
+              12 маусым 2026 
+            </h3>
+            <p
+              class="text-stone-800 font-bold mt-6 tracking-[0.3em] uppercase text-sm italic"
+            >
+              Жұма • 19:00
+            </p>
+          </div>
+
+          <div
+            class="bg-[#faf9f6] p-8 md:p-12 rounded-[3rem] border border-stone-200 shadow-sm"
+          >
+            <div
+              class="grid grid-cols-7 text-[13px] font-bold text-stone-500 mb-6 tracking-widest uppercase border-b border-stone-200 pb-4"
+            >
+              <div>Пн</div>
+              <div>Вт</div>
+              <div>Ср</div>
+              <div>Чт</div>
+              <div>Пт</div>
+              <div>Сб</div>
+              <div class="text-[#b38b59]">Вс</div>
+            </div>
+
+            <div
+              class="calendar-grid grid grid-cols-7 gap-y-3 font-semibold text-stone-800"
+            >
+              <div class="">1</div>
+              <div class="">2</div>
+              <div class="">3</div>
+              <div class="">4</div>
+              <div class="">5</div>
+              <div class="">6</div>
+              <div class="">7</div>
+              <div class="">8</div>
+              <div class="">9</div>
+              <div class="">10</div>
+              <div class="">11</div>
+
+              <div class="heart-marker text-white relative">
+                <svg class="heart-svg" viewBox="0 0 32 32">
+                  <path
+                    d="M16 28.5s-12-7.2-12-14.5c0-4 3.1-7 7-7 2.3 0 4.4 1.2 5 3.2 0.6-2 2.7-3.2 5-3.2 3.9 0 7 3 7 7 0 7.3-12 14.5-12 14.5z"
+                  />
+                </svg>
+                <span class="relative z-10 pt-8">12</span>
+              </div>
+
+              
+              <div>13</div>
+              <div>14</div>
+              <div>15</div>
+              <div>16</div>
+              <div>17</div>
+              <div>18</div>
+              <div>19</div>
+              <div>20</div>
+              <div>21</div>
+              <div>22</div>
+              <div>23</div>
+              <div>24</div>
+              <div>25</div>
+              <div>26</div>
+              <div>27</div>
+              <div>28</div>
+              <div>29</div>
+              <div>30</div>
+              <div class="text-stone-300">1</div>
+              <div class="text-stone-300">2</div>
+              <div class="text-stone-300">3</div>
+              <div class="text-stone-300">4</div>
+              <div class="text-stone-300">5</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-28 px-10 bg-[#faf9f6]">
+        <div class="max-w-2xl mx-auto text-center" data-aos="fade-up">
+          <h3 class="text-5xl font-serif-fancy text-[#8c7851] mb-10">
+            Салтанат мекені
+          </h3>
+          <p class="text-stone-900 font-bold mb-2 text-2xl">
+            «Сәтті» банкет залы
+          </p>
+          <p
+            class="text-stone-600 text-sm tracking-[0.3em] uppercase mb-14 font-medium"
+          >
+            Орал қ-сы, 
+            <br/>Брусиловского, 132
+          </p>
+          <a
+            href="https://2gis.kz/almaty/firm/70000001023455019"
+            target="_blank"
+            class="map-button inline-block px-16 py-5 text-[#b38b59] text-xs font-bold uppercase tracking-[0.4em] rounded-full hover:bg-[#b38b59] hover:text-white transition-all shadow-md bg-white"
+          >
+            Картадан көру
+          </a>
+        </div>
+      </section>
+
+      <section class="py-28 px-10 text-center bg-white">
+        <div data-aos="fade-up" class="max-w-2xl mx-auto">
+          <h3
+            class="text-5xl md:text-6xl font-serif-fancy text-[#8c7851] mb-10"
+          >
+            Dress Code
+          </h3>
+
+          <div class="space-y-6 mb-16">
+            <p
+              class="text-stone-700 text-lg md:text-xl font-light leading-relaxed italic"
+            >
+              Бұл күні ақ түс қалыңдықтың ерекше белгісі болмақ. 
+    Сондықтан сіздерден өз образдарыңызда 
+    <span class="text-[#000042] font-semibold">ақ түсті қолданбауынызды өтінеміз.</span>
+            </p>
+
+           
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="py-32 text-center bg-[#faf9f6]">
+        <div data-aos="fade-up">
+          <p
+            class="text-xs leading-6 uppercase tracking-[0.6em] text-[#b38b59] mb-12 font-bold"
+          >
+            Құрметпен
+          </p>
+          <div class="space-y-6">
+            <h4
+              class="text-6xl md:text-8xl font-names text-stone-900 leading-2"
+            >
+              Тарас &<br />Гульжанат
+            </h4>
+          </div>
+          <p class="mt-20 text-xs tracking-[0.5em] text-stone-600 uppercase">
+            Сізді қуана күтеміз!
+          </p>
+        </div>
+      </footer>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init({ duration: 1500, once: true });
+
+      const preloader = document.getElementById("preloader"),
+        introOverlay = document.getElementById("intro-overlay"),
+        introVideo = document.getElementById("intro-video"),
+        mainContent = document.getElementById("main-content"),
+        musicContainer = document.getElementById("music-container"),
+        bgSong = document.getElementById("bg-song"),
+        musicBtn = document.getElementById("music-btn"),
+        musicIconSvg = document.getElementById("music-icon-svg"),
+        rotatingSvg = document.querySelector(".rotating-text");
+
+      const playIcon =
+        '<svg viewBox="0 0 24 24"><path d="M8 5.14v14.72a1 1 0 0 0 1.5.86l11-7.36a1 1 0 0 0 0-1.72l-11-7.36a1 1 0 0 0-1.5.86z"/></svg>';
+      const pauseIcon =
+        '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+      let isStarted = false;
+      let sectionTimeout;
+      let currentSectionIndex = 0;
+      const sections = document.querySelectorAll("section, footer");
+
+      // --- ФУНКЦИЯ ПЛАВНОГО КАСТОМНОГО СКРОЛЛА ---
+      function smoothScrollTo(targetPosition, duration) {
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        let startTime = null;
+
+        function animation(currentTime) {
+          if (startTime === null) startTime = currentTime;
+          const timeElapsed = currentTime - startTime;
+
+          // Функция плавности (Ease-in-out)
+          const run = ease(timeElapsed, startPosition, distance, duration);
+
+          window.scrollTo(0, run);
+
+          if (timeElapsed < duration) {
+            requestAnimationFrame(animation);
+          }
+        }
+
+        // Математическая функция для мягкого старта и стопа
+        function ease(t, b, c, d) {
+          t /= d / 2;
+          if (t < 1) return (c / 2) * t * t + b;
+          t--;
+          return (-c / 2) * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animation);
+      }
+
+      // --- ОБНОВЛЕННАЯ ЛОГИКА ПЕРЕХОДА ---
+      function scrollToNextSection() {
+        if (introOverlay.parentNode) return;
+
+        let closestIndex = 0;
+        let minDistance = Math.abs(window.pageYOffset - sections[0].offsetTop);
+
+        sections.forEach((section, index) => {
+          const distance = Math.abs(window.pageYOffset - section.offsetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+          }
+        });
+
+        const nextIndex = closestIndex + 1;
+
+        if (nextIndex < sections.length) {
+          const targetTop = sections[nextIndex].offsetTop;
+
+          // ВТОРОЙ ПАРАМЕТР (3000) — это длительность скролла в миллисекундах.
+          // Поставь 5000, если хочешь, чтобы он ехал ОЧЕНЬ медленно.
+          smoothScrollTo(targetTop, 3000);
+        }
+      }
+
+      function resetSectionTimer() {
+        clearTimeout(sectionTimeout);
+        // Запускаем переход через 3 секунды неактивности
+        if (isStarted && !introOverlay.parentNode) {
+          sectionTimeout = setTimeout(scrollToNextSection, 4000);
+        }
+      }
+
+      // --- ЛОГИКА ИНТРО ---
+      window.onload = () => {
+        preloader.style.opacity = "0";
+        setTimeout(() => {
+          preloader.remove();
+        }, 500);
+      };
+
+     function activate() {
+        if (isStarted) return;
+        isStarted = true;
+
+        // Звуковые настройки
+        bgSong.volume = 0.2;
+        
+        // Попытка запустить видео со звуком
+        introVideo.muted = false; 
+        let playPromise = introVideo.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            introVideo.muted = true;
+            introVideo.play();
+          });
+        }
+
+        // Запуск музыки
+        bgSong.play()
+          .then(updateMusic)
+          .catch(e => console.log("Safari requirements check..."));
+
+        // Плавное исчезновение ленты при клике
+        const ribbon = introOverlay.querySelector('div.absolute.bottom-\\[25\\%\\]');
+        if (ribbon) {
+            ribbon.style.transition = "all 0.8s ease";
+            ribbon.style.opacity = "0";
+            ribbon.style.transform = "translateY(20px)";
+        }
+
+        // Уходим в основной контент
+        setTimeout(fade, 4800);
+        introVideo.onended = fade;
+      }
+
+      // --- СОБЫТИЯ ---
+      // Клик по всему оверлею запускает процесс
+      introOverlay.addEventListener("click", activate);
+
+      // Удаляем старый автозапуск из конца кода! 
+      // Вместо него можно оставить только этот блок, если хочешь запуск БЕЗ кнопки через 10 сек (на случай если гость тупит)
+      window.autoStartTimer = setTimeout(() => {
+         // Но помни: в Safari без клика музыка НЕ заиграет.
+         // Лучше оставить только клик.
+      }, 10000);
+
+      // Кнопка управления музыкой на самом сайте (уже после интро)
+      musicBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Чтобы клик по кнопке не вызывал события на родителях
+        bgSong.paused ? bgSong.play() : bgSong.pause();
+        updateMusic();
+      });
+
+      function fade() {
+        if (mainContent.classList.contains("opacity-100")) return;
+        introOverlay.classList.add("fade-out");
+        mainContent.classList.replace("opacity-0", "opacity-100");
+        musicContainer.classList.remove("hidden");
+        setTimeout(() => {
+          musicContainer.classList.add("opacity-100");
+          document.body.style.overflow = "auto";
+          if (introOverlay.parentNode) introOverlay.remove();
+
+          // Активируем первый таймер
+          resetSectionTimer();
+        }, 1000);
+      }
+
+      const musicIconImg = document.getElementById("music-icon-img");
+
+function updateMusic() {
+  // Меняем путь к файлу в зависимости от состояния
+  musicIconImg.src = bgSong.paused ? "play.svg" : "pause.svg";
+  
+  // Управление вращением текста
+  rotatingSvg.style.animationPlayState = bgSong.paused ? "paused" : "running";
+
+  // Небольшой фикс центровки для иконки Play (она часто кажется смещенной влево)
+  if (bgSong.paused) {
+    musicIconImg.classList.add('pl-0.5');
+  } else {
+    musicIconImg.classList.remove('pl-0.5');
+  }
+}
+
+// Обработка клика и тача (чтобы точно нажималось на мобилках)
+const toggleMusic = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  bgSong.paused ? bgSong.play().then(updateMusic) : bgSong.pause();
+  updateMusic();
+};
+
+musicBtn.addEventListener("click", toggleMusic);
+musicBtn.addEventListener("touchstart", toggleMusic, { passive: false });
+
+      // --- СОБЫТИЯ ---
+      introOverlay.addEventListener("click", activate);
+      musicBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        bgSong.paused ? bgSong.play() : bgSong.pause();
+        updateMusic();
+      });
+
+      // Любое действие пользователя сбрасывает 3-секундный таймер
+      ["mousedown", "wheel", "touchstart", "scroll", "keydown"].forEach(
+        (event) => {
+          window.addEventListener(event, resetSectionTimer, { passive: true });
+        },
+      );
+
+      
+    </script>
+  </body>
+</html>
