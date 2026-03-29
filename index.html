@@ -94,15 +94,10 @@
         }
       }
 
-      /* Intro video: тёмный фон; до тапа скрыто — показ в activate(), не на playing (iOS часто не шлёт playing) */
+      /* Intro video: всегда виден слой, тёмная заливка до первого кадра — без мигания opacity */
       #intro-video {
         background-color: #0c0c0c;
-        opacity: 0;
-        transition: opacity 0.28s ease-out;
         transform: translateZ(0);
-      }
-      #intro-video.intro-video-visible {
-        opacity: 1;
       }
 
       /* ЛЕНТА */
@@ -278,7 +273,8 @@
         playsinline
         webkit-playsinline
         muted
-        preload="metadata"
+        preload="auto"
+        src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videorus.mp4"
       >
         <source src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videorus.mp4" type="video/mp4" />
       </video>
@@ -709,7 +705,7 @@
       introVideo.setAttribute("webkit-playsinline", "");
       introVideo.setAttribute("playsinline", "");
 
-      // Safari / мобильные часто не качают mp4 до жеста — первый pointer запрашивает данные
+      // До тапа на мобилках подтягиваем данные (preload часто режется без жеста)
       introOverlay.addEventListener(
         "pointerdown",
         () => {
@@ -717,6 +713,11 @@
         },
         { once: true, passive: true },
       );
+
+      try {
+        introVideo.pause();
+        introVideo.currentTime = 0;
+      } catch (e) {}
 
       let isStarted = false;
       let sectionTimeout;
@@ -773,41 +774,20 @@
      function activate() {
         if (isStarted) return;
         isStarted = true;
-        introVideo.classList.add("intro-video-visible");
 
         // Звуковые настройки
         bgSong.volume = 0.2;
 
-        function playWithFallbackMuted() {
-          introVideo.muted = false;
-          const playPromise = introVideo.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {
-              introVideo.muted = true;
-              introVideo.play();
-            });
-          }
-        }
-
-        let introUnmuteScheduled = false;
-        function afterMutedStarted() {
-          if (introUnmuteScheduled) return;
-          introUnmuteScheduled = true;
-          queueMicrotask(() => {
-            playWithFallbackMuted();
-          });
-        }
-
-        // iOS/Android: первый play() в жесте с muted — иначе буфер не стартует / play блокируется
+        // Один вызов play(), без смены muted → unmute (это даёт фликер на части устройств).
+        // Звук на интро — из bg-song; дорожку видео оставляем muted.
         introVideo.muted = true;
-        const first = introVideo.play();
-        if (first !== undefined) {
-          first.then(afterMutedStarted).catch(() => {
-            introVideo.addEventListener("canplay", afterMutedStarted, { once: true });
-            introVideo.addEventListener("loadeddata", afterMutedStarted, { once: true });
+        const playPromise = introVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            introVideo.addEventListener("canplay", () => introVideo.play(), {
+              once: true,
+            });
           });
-        } else {
-          afterMutedStarted();
         }
 
         introVideo.addEventListener(

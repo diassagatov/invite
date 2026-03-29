@@ -100,12 +100,7 @@
 
       #intro-video {
         background-color: #0c0c0c;
-        opacity: 0;
-        transition: opacity 0.28s ease-out;
         transform: translateZ(0);
-      }
-      #intro-video.intro-video-visible {
-        opacity: 1;
       }
 
       /* ЛЕНТА */
@@ -281,7 +276,8 @@
         playsinline
         webkit-playsinline
         muted
-        preload="metadata"
+        preload="auto"
+        src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videokaz.mp4"
       >
         <source src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videokaz.mp4" type="video/mp4" />
       </video>
@@ -573,6 +569,11 @@
         { once: true, passive: true },
       );
 
+      try {
+        introVideo.pause();
+        introVideo.currentTime = 0;
+      } catch (e) {}
+
       let isStarted = false;
       let sectionTimeout;
       let currentSectionIndex = 0;
@@ -654,40 +655,18 @@
      function activate() {
         if (isStarted) return;
         isStarted = true;
-        introVideo.classList.add("intro-video-visible");
 
         // Звуковые настройки
         bgSong.volume = 0.2;
 
-        function playWithFallbackMuted() {
-          introVideo.muted = false;
-          const playPromise = introVideo.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {
-              introVideo.muted = true;
-              introVideo.play();
-            });
-          }
-        }
-
-        let introUnmuteScheduled = false;
-        function afterMutedStarted() {
-          if (introUnmuteScheduled) return;
-          introUnmuteScheduled = true;
-          queueMicrotask(() => {
-            playWithFallbackMuted();
-          });
-        }
-
         introVideo.muted = true;
-        const first = introVideo.play();
-        if (first !== undefined) {
-          first.then(afterMutedStarted).catch(() => {
-            introVideo.addEventListener("canplay", afterMutedStarted, { once: true });
-            introVideo.addEventListener("loadeddata", afterMutedStarted, { once: true });
+        const playPromise = introVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            introVideo.addEventListener("canplay", () => introVideo.play(), {
+              once: true,
+            });
           });
-        } else {
-          afterMutedStarted();
         }
 
         introVideo.addEventListener(
