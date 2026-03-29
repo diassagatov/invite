@@ -94,6 +94,17 @@
         }
       }
 
+      /* Intro video: тёмный фон; до тапа скрыто — показ в activate(), не на playing (iOS часто не шлёт playing) */
+      #intro-video {
+        background-color: #0c0c0c;
+        opacity: 0;
+        transition: opacity 0.28s ease-out;
+        transform: translateZ(0);
+      }
+      #intro-video.intro-video-visible {
+        opacity: 1;
+      }
+
       /* ЛЕНТА */
       .ribbon-container {
         position: relative;
@@ -263,7 +274,7 @@
     >
       <video
         id="intro-video"
-        class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        class="pointer-events-none absolute inset-0 h-full w-full object-cover bg-[#0c0c0c]"
         playsinline
         webkit-playsinline
         muted
@@ -762,6 +773,7 @@
      function activate() {
         if (isStarted) return;
         isStarted = true;
+        introVideo.classList.add("intro-video-visible");
 
         // Звуковые настройки
         bgSong.volume = 0.2;
@@ -781,7 +793,7 @@
         function afterMutedStarted() {
           if (introUnmuteScheduled) return;
           introUnmuteScheduled = true;
-          requestAnimationFrame(() => {
+          queueMicrotask(() => {
             playWithFallbackMuted();
           });
         }
