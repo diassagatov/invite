@@ -787,7 +787,31 @@
         requestAnimationFrame(animation);
       }
 
-      function scrollToNextSection() {}
+       // --- ОБНОВЛЕННАЯ ЛОГИКА ПЕРЕХОДА ---
+      function scrollToNextSection() {
+        if (introOverlay.parentNode) return;
+
+        let closestIndex = 0;
+        let minDistance = Math.abs(window.pageYOffset - sections[0].offsetTop);
+
+        sections.forEach((section, index) => {
+          const distance = Math.abs(window.pageYOffset - section.offsetTop);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+          }
+        });
+
+        const nextIndex = closestIndex + 1;
+
+        if (nextIndex < sections.length) {
+          const targetTop = sections[nextIndex].offsetTop;
+
+          // ВТОРОЙ ПАРАМЕТР (3000) — это длительность скролла в миллисекундах.
+          // Поставь 5000, если хочешь, чтобы он ехал ОЧЕНЬ медленно.
+          smoothScrollTo(targetTop, 3000);
+        }
+      }
 
       function resetSectionTimer() {
         clearTimeout(sectionTimeout);

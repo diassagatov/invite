@@ -205,6 +205,31 @@
   width: 100%;
 }
 
+
+
+
+
+
+
+
+#intro-overlay {
+  background-color: #faf9f6; /* Цвет должен совпадать с фоном сайта */
+  background-image: url("./intro-videokaz.jpg");
+  background-size: cover;
+  background-position: center;
+  z-index: 500; /* Поднимаем выше всего */
+  transition: opacity 0.8s ease-in-out;
+}
+
+#intro-video {
+  opacity: 0; /* Скрыто, пока не начнет играть */
+  transition: opacity 0.3s ease;
+}
+
+#intro-video.is-playing {
+  opacity: 1; /* Показываем только когда реально пошло видео */
+}
+
 /* Динамический размер текста: 8% от ширины экрана, но не меньше 24px и не больше 80px */
 
 
@@ -654,51 +679,54 @@
       };
 
      function activate() {
-        if (isStarted) return;
+  if (isStarted) return;
 
-        introVideo.playsInline = true;
-        introVideo.muted = true;
+  // 1. Подготавливаем видео
+  introVideo.muted = true;
+  
+  // 2. Событие, которое сработает, когда видео РЕАЛЬНО начало показывать кадры
+  introVideo.addEventListener('playing', () => {
+    introVideo.classList.add('is-playing');
+  }, { once: true });
 
-        function afterIntroPlayBegins() {
-          if (isStarted) return;
-          isStarted = true;
+  function afterIntroPlayBegins() {
+    if (isStarted) return;
+    isStarted = true;
 
-          bgSong.volume = 0.2;
-          bgSong.play()
-            .then(updateMusic)
-            .catch(() => {});
+    // Запуск музыки
+    bgSong.volume = 0.2;
+    bgSong.play().then(updateMusic).catch(() => {});
 
-          const ribbon = introOverlay.querySelector(
-            'div.absolute.bottom-\\[25\\%\\]',
-          );
-          if (ribbon) {
-            ribbon.style.transition = "all 0.8s ease";
-            ribbon.style.opacity = "0";
-            ribbon.style.transform = "translateY(20px)";
-          }
+    // Таймер на исчезновение интро (через 4.8 сек или по окончании)
+    setTimeout(fade, 4800);
+    introVideo.onended = fade;
+  }
 
-          setTimeout(fade, 4800);
-          introVideo.onended = fade;
-        }
+  // Попытка запуска
+  introVideo.play()
+    .then(afterIntroPlayBegins)
+    .catch(err => {
+      console.log("Video play failed:", err);
+      // Если видео совсем не смогло завестись, сразу переходим к сайту
+      fade();
+    });
+}
 
-        const p = introVideo.play();
-        if (p !== undefined) {
-          p.then(afterIntroPlayBegins).catch(() => {
-            const retry = () => {
-              introVideo.removeEventListener("canplay", retry);
-              introVideo.removeEventListener("loadeddata", retry);
-              introVideo
-                .play()
-                .then(afterIntroPlayBegins)
-                .catch(() => {});
-            };
-            introVideo.addEventListener("canplay", retry, { once: true });
-            introVideo.addEventListener("loadeddata", retry, { once: true });
-          });
-        } else {
-          afterIntroPlayBegins();
-        }
-      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       introOverlay.addEventListener("click", activate);
       introOverlay.addEventListener("touchend", activate, { passive: true });
