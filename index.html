@@ -265,7 +265,7 @@
 
  <div
       id="intro-overlay"
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-[#faf9f6] cursor-pointer"
+      class="fixed inset-0 z-[100] flex touch-manipulation cursor-pointer items-center justify-center bg-[#faf9f6]"
     >
       <video
         id="intro-video"
@@ -275,9 +275,7 @@
         muted
         preload="auto"
         src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videorus.mp4"
-      >
-        <source src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videorus.mp4" type="video/mp4" />
-      </video>
+      ></video>
       
       <div class="absolute inset-0 bg-black/10 z-10"></div>
 
@@ -704,20 +702,8 @@
       introVideo.playsInline = true;
       introVideo.setAttribute("webkit-playsinline", "");
       introVideo.setAttribute("playsinline", "");
-
-      // До тапа на мобилках подтягиваем данные (preload часто режется без жеста)
-      introOverlay.addEventListener(
-        "pointerdown",
-        () => {
-          introVideo.load();
-        },
-        { once: true, passive: true },
-      );
-
-      try {
-        introVideo.pause();
-        introVideo.currentTime = 0;
-      } catch (e) {}
+      introVideo.setAttribute("muted", "");
+      introVideo.defaultMuted = true;
 
       let isStarted = false;
       let sectionTimeout;
@@ -755,9 +741,10 @@
         requestAnimationFrame(animation);
       }
 
+      function scrollToNextSection() {}
+
       function resetSectionTimer() {
         clearTimeout(sectionTimeout);
-        
         if (isStarted && !introOverlay.parentNode) {
           sectionTimeout = setTimeout(scrollToNextSection, 4000);
         }
@@ -778,15 +765,19 @@
         // Звуковые настройки
         bgSong.volume = 0.2;
 
-        // Один вызов play(), без смены muted → unmute (это даёт фликер на части устройств).
-        // Звук на интро — из bg-song; дорожку видео оставляем muted.
+        introVideo.playsInline = true;
         introVideo.muted = true;
+
         const playPromise = introVideo.play();
         if (playPromise !== undefined) {
           playPromise.catch(() => {
-            introVideo.addEventListener("canplay", () => introVideo.play(), {
-              once: true,
-            });
+            const retry = () => {
+              introVideo.removeEventListener("canplay", retry);
+              introVideo.removeEventListener("loadeddata", retry);
+              introVideo.play().catch(() => {});
+            };
+            introVideo.addEventListener("canplay", retry, { once: true });
+            introVideo.addEventListener("loadeddata", retry, { once: true });
           });
         }
 
@@ -816,7 +807,6 @@
         introVideo.onended = fade;
       }
 
-      // --- СОБЫТИЯ ---
       introOverlay.addEventListener("click", activate);
       introOverlay.addEventListener("touchend", activate, { passive: true });
 
