@@ -94,10 +94,15 @@
         }
       }
 
-      /* Intro video: всегда виден слой, тёмная заливка до первого кадра — без мигания opacity */
+      /* Интро: до первого кадра показывает poster; без сплошной чёрной заливки поверх постера */
+      #intro-overlay {
+        background-color: #faf9f6;
+        background-image: url("photo.webp");
+        background-size: cover;
+        background-position: center;
+      }
       #intro-video {
-        background-color: #0c0c0c;
-        transform: translateZ(0);
+        background-color: transparent;
       }
 
       /* ЛЕНТА */
@@ -265,19 +270,20 @@
 
  <div
       id="intro-overlay"
-      class="fixed inset-0 z-[100] flex touch-manipulation cursor-pointer items-center justify-center bg-[#faf9f6]"
+      class="fixed inset-0 z-[100] flex touch-manipulation cursor-pointer items-center justify-center"
     >
       <video
         id="intro-video"
-        class="pointer-events-none absolute inset-0 h-full w-full object-cover bg-[#0c0c0c]"
+        class="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
         playsinline
         webkit-playsinline
         muted
         preload="auto"
-        src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videorus.mp4"
+        poster="photo.webp"
+        src="https://bgop6ipnd8mjpvoi.public.blob.vercel-storage.com/intro-videorus.mp4#t=0.1"
       ></video>
-      
-      <div class="absolute inset-0 bg-black/10 z-10"></div>
+
+      <div class="pointer-events-none absolute inset-0 z-10 bg-black/10"></div>
 
 
 
@@ -705,6 +711,14 @@
       introVideo.setAttribute("muted", "");
       introVideo.defaultMuted = true;
 
+      introVideo.addEventListener(
+        "error",
+        () => {
+          fade();
+        },
+        { once: true },
+      );
+
       let isStarted = false;
       let sectionTimeout;
       let currentSectionIndex = 0;
@@ -760,51 +774,49 @@
 
      function activate() {
         if (isStarted) return;
-        isStarted = true;
-
-        // Звуковые настройки
-        bgSong.volume = 0.2;
 
         introVideo.playsInline = true;
         introVideo.muted = true;
 
-        const playPromise = introVideo.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
+        function afterIntroPlayBegins() {
+          if (isStarted) return;
+          isStarted = true;
+
+          bgSong.volume = 0.2;
+          bgSong.play()
+            .then(updateMusic)
+            .catch(() => {});
+
+          const ribbon = introOverlay.querySelector(
+            'div.absolute.bottom-\\[25\\%\\]',
+          );
+          if (ribbon) {
+            ribbon.style.transition = "all 0.8s ease";
+            ribbon.style.opacity = "0";
+            ribbon.style.transform = "translateY(20px)";
+          }
+
+          setTimeout(fade, 4800);
+          introVideo.onended = fade;
+        }
+
+        const p = introVideo.play();
+        if (p !== undefined) {
+          p.then(afterIntroPlayBegins).catch(() => {
             const retry = () => {
               introVideo.removeEventListener("canplay", retry);
               introVideo.removeEventListener("loadeddata", retry);
-              introVideo.play().catch(() => {});
+              introVideo
+                .play()
+                .then(afterIntroPlayBegins)
+                .catch(() => {});
             };
             introVideo.addEventListener("canplay", retry, { once: true });
             introVideo.addEventListener("loadeddata", retry, { once: true });
           });
+        } else {
+          afterIntroPlayBegins();
         }
-
-        introVideo.addEventListener(
-          "error",
-          () => {
-            fade();
-          },
-          { once: true },
-        );
-
-        // Запуск музыки
-        bgSong.play()
-          .then(updateMusic)
-          .catch(e => console.log("Safari requirements check..."));
-
-        // Плавное исчезновение ленты при клике
-        const ribbon = introOverlay.querySelector('div.absolute.bottom-\\[25\\%\\]');
-        if (ribbon) {
-            ribbon.style.transition = "all 0.8s ease";
-            ribbon.style.opacity = "0";
-            ribbon.style.transform = "translateY(20px)";
-        }
-
-        // Уходим в основной контент
-        setTimeout(fade, 4800);
-        introVideo.onended = fade;
       }
 
       introOverlay.addEventListener("click", activate);
